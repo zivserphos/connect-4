@@ -1,0 +1,25 @@
+{
+  "name": "connect-4",
+  "version": "1.0.0",
+  "description": "build a frontEnd connect-4 game using mvc design pattern",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zivserphos/connect-4.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zivserphos/connect-4/issues"
+  },
+  "homepage": "https://github.com/zivserphos/connect-4#readme",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "boostrap": "^2.0.0"
+  }
+}
