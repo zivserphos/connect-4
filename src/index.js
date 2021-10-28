@@ -1,18 +1,89 @@
 class Model {
     constructor() {
-        this.board = generateBoard()
-        this.index = 0;
+        this.board = this.generateBoard()
+        console.log(this.board)
+        this.currentPlayer = "RED";
+        this.finished = false;
     }
 
-    // set board(arr) {
-    //     const [x,y] = arr;
-    //     if (this.index % 2 === 0) {
-    //         this.board[x][y] = "RED"
-    //         return this.board
-    //     }
-    //     this.board[x][y] = "BLUE"
-    //     return this.board    
-    // }
+    play(move) {
+
+
+    }
+
+    draw() {
+        for (let i=0; i<7; i++) {
+            for (let k=0; k<7; k++) {
+                if (arrR[i][k] !== "RED" && arr[i][k] !== "BLUE") {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    generateBoard() {
+        const arrR = [[] , [] , []  , [] , [] , [] , []]
+        for (let i =1; i<8; i++){
+            for (let k=1; k<8; k++) {
+                arrR[i-1].push([i , k])
+            }
+        }
+        return arrR;
+    }
+
+
+    victory() {
+        let sequence = 0;
+        for (let i =0; i<7; i++) { // win by 4 in a row
+            for (let k=0; k<7; k++) {
+                if (this.arrR[i][k] === this.arrR[i][k+1]) {
+                    sequence+=1;
+                }
+                else {
+                    sequence =0;
+                }
+                if (sequence === 4) {
+                    return true;
+                }
+            }
+        }
+        for (let i =0; i<7; i++) { // win by 4 in a column
+            for (let k=0; k<7; k++) {
+                if (this.arrR[k][i] === this.arrR[k+1][i]) {
+                    sequence+=1;
+                }
+                else {
+                    sequence =0;
+                }
+                if (sequence === 4) {
+                    return true;
+                }
+            }
+        }
+        for (let i =0; i<7; i++) { // win by 4 in a
+            for (let k=0; k<7; k++) {
+                while (this.arrR[i][k] === this.arrR[i+1][k+1])  {
+                    sequence+=1;
+                    i+=1;
+                    k+=1;
+                }
+                if (sequence === 4) {
+                    return true;
+                }
+                else { 
+                    i-=sequence;
+                    k-= sequence;
+                }
+            }
+        }
+        return false;
+
+    }
+
+    switchPlayer() {
+        this.currentPlayer === "RED" ? "BLUE" : "RED"
+    }
     
 }
 
@@ -22,10 +93,12 @@ class View{
     }
     defaultBoard() {
         const root = document.getElementById("root")
+        const parentDiv = this.createElement("div" , [] , ["parent"])
         for (let i = 0; i<49; i++) {
-            const div = this.createElement("div" , "sqr")
-            root.append(div)
+            const div = this.createElement("div" , ["boolbool"] , [`div${i+1}`])
+            parentDiv.append(div)
         }
+        root.append(parentDiv)
 
     }
     createElement(tagName, children = [], classes = [], attributes = {}) { // create new element in more comfortable
@@ -55,16 +128,6 @@ class Controller{
 
     set coin(coin){
         this.#model.board(coin)
-    }
-}
-
-function generateBoard() {
-    const arrR = [[] , [] , []  , [] , [] , [] , []]
-    console.log(arrR[3]);
-    for (let i =1; i<8; i++){
-        for (let k=1; k<8; k++) {
-            arrR[i-1].push([i , k])
-        }
     }
 }
 
