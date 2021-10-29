@@ -1,105 +1,150 @@
+class Event {
+    constructor() {
+      this.listeners = [];
+    }
+  
+    addListener(listener) {
+      this.listeners.push(listener);
+    }
+  
+    trigger(params) {
+      this.listeners.forEach(listener => { listener(params); });
+    }
+  }
+
 class Model {
     constructor() {
         this.board = this.generateBoard()
         console.log(this.board)
         this.currentPlayer = "RED";
         this.finished = false;
+
+        this.updateCellEvent = new Event();
+        this.victoryEvent = new Event();
+        this.drawEvent = new Event();
     }
 
     play(move) {
-
-
-    }
-
-    draw() {
-        for (let i=0; i<7; i++) {
-            for (let k=0; k<7; k++) {
-                if (arrR[i][k] !== "RED" && arr[i][k] !== "BLUE") {
-                    return false;
-                }
-            }
+        console.log("Model Play function")
+        if (this.finished || move < 0 || move > 48 || this.board === "RED" || this.board === "BLUE") {
+             return false;
+        }
+        this.board[Math.floor(move/7)][move%7] = this.currentPlayer;
+        console.log(this.board)
+        this.updateCellEvent.trigger({ move , player: this.currentPlayer });
+        this.finished = this.victory() || this.draw();
+        if (!this.finished) {
+            this.switchPlayer()
         }
         return true;
     }
 
+    draw() {
+        console.log("check draw in model")
+        let draw = true;
+        for (let i=0; i<7; i++) {
+            for (let k=0; k<7; k++) {
+                if (this.board[i][k] !== "RED" && this.board[i][k] !== "BLUE") {
+                    draw = false;
+                }
+            }
+        } 
+        if (draw) {
+            this.drawEvent.trigger()
+        }
+        return draw;
+    }
+
     generateBoard() {
         const arrR = [[] , [] , []  , [] , [] , [] , []]
-        for (let i =1; i<8; i++){
-            for (let k=1; k<8; k++) {
-                arrR[i-1].push([i , k])
-            }
+        for (let i =0; i<7; i++){
+            // for (let k=1; k<8; k++) {
+            //     arrR[i-1].push([i , k])
+            // }
+            arrR[i] = [,,,,,,,]
         }
         return arrR;
     }
 
 
     victory() {
+        console.log("check victory in model")
+        console.log(this.currentPlayer)
         let sequence = 0;
-        for (let i =0; i<7; i++) { // win by 4 in a row
-            for (let k=0; k<7; k++) {
-                if (this.arrR[i][k] === this.arrR[i][k+1]) {
-                    sequence+=1;
-                }
-                else {
-                    sequence =0;
-                }
-                if (sequence === 4) {
-                    return true;
-                }
-            }
+        let victory=false
+        // for (let i =0; i<7; i++) { // win by 4 in a row
+        //     for (let k=0; k<7; k++) {
+        //         console.log(this.board[i][k] !== undefined)
+        //         if (this.board[i][k] === this.board[i][k+1] && this.board[i][k] !== undefined) {
+        //             sequence+=1;
+        //         }
+        //         else {
+        //             sequence =0;
+        //         }
+        //         if (sequence === 3) {
+        //             victory = true;
+        //         }
+        //     }
+        // }
+        // for (let i =0; i<7; i++) { // win by 4 in a column
+        //     for (let k=0; k<6; k++) {
+        //         if (this.board[k][i] === this.board[k+1][i]) {
+        //             sequence+=1;
+        //         }
+        //         else {
+        //             sequence =0;
+        //         }
+        //         if (sequence === 3) {
+        //             victory = true;
+        //         }
+        //     }
+        // }
+        // for (let i =0; i<7; i++) { // win by 4 in a
+        //     for (let k=0; k<7; k++) {
+        //         while (this.board[i][k] === this.board[i+1][k+1])  {
+        //             sequence+=1;
+        //             i+=1;
+        //             k+=1;
+        //         }
+        //         if (sequence === 3) {
+        //             victory = true;
+        //         }
+        //         else { 
+        //             i-=sequence;
+        //             k-= sequence;
+        //         }
+        //     }
+        // }
+        if (victory) {
+            this.victoryEvent.trigger(this.currentPlayer)
         }
-        for (let i =0; i<7; i++) { // win by 4 in a column
-            for (let k=0; k<7; k++) {
-                if (this.arrR[k][i] === this.arrR[k+1][i]) {
-                    sequence+=1;
-                }
-                else {
-                    sequence =0;
-                }
-                if (sequence === 4) {
-                    return true;
-                }
-            }
-        }
-        for (let i =0; i<7; i++) { // win by 4 in a
-            for (let k=0; k<7; k++) {
-                while (this.arrR[i][k] === this.arrR[i+1][k+1])  {
-                    sequence+=1;
-                    i+=1;
-                    k+=1;
-                }
-                if (sequence === 4) {
-                    return true;
-                }
-                else { 
-                    i-=sequence;
-                    k-= sequence;
-                }
-            }
-        }
-        return false;
+        return victory;
 
     }
 
     switchPlayer() {
-        this.currentPlayer === "RED" ? "BLUE" : "RED"
+        this.currentPlayer = this.currentPlayer === "RED" ? "BLUE" : "RED"
     }
     
 }
 
 class View{
     constructor() {
+        console.log("view created")
+        this.playEvent = new Event();
         this.board = this.defaultBoard()
     }
     defaultBoard() {
         const root = document.getElementById("root")
         const parentDiv = this.createElement("div" , [] , ["parent"])
         for (let i = 0; i<49; i++) {
-            const div = this.createElement("div" , ["boolbool"] , [`div${i+1}`])
+            const div = this.createElement("div" , [] , [`div${i+1}`])
+            div.addEventListener('click', () => {
+                this.playEvent.trigger(i)
+            })
             parentDiv.append(div)
         }
         root.append(parentDiv)
-
     }
     createElement(tagName, children = [], classes = [], attributes = {}) { // create new element in more comfortable
         const el = document.createElement(tagName); 
@@ -114,21 +159,46 @@ class View{
         }
         return el
     }
+
+    updateCell(data) {
+        let index =0;
+        let columnButtom = document.querySelector(`.div${49 - (6 -data.move % 7)}`)
+        while (columnButtom.style.backgroundColor !== "") {
+            index+=7;
+            columnButtom = document.querySelector(`.div${49 - (6 -data.move % 7 + index)}`)
+        }
+        console.log(6 -data.move % 7+index)
+        if (6 -data.move % 7+index < 50){
+            console.log("update cell in View")
+            document.querySelector(`.div${49 - ((6 -data.move % 7)+index)}`).style.backgroundColor = data.player;
+        }
+        // console.log("update cell in View")
+        // document.querySelector(`.div${data.move +1}`).style.backgroundColor = data.player;
+      }
     
+      victory(winner) {
+        alert(`${winner} wins!`);
+      }
     
+      draw() {
+        this.message.innerHTML = "It's a draw!";
+    }   
 }
 
 class Controller{
-    #model
-    #view
     constructor(model , view) {
-        this.#model = model;
-        this.#view = view
-    }
+        console.log("controller constructor")
+        this.model = new Model;
+        this.view = new View;
 
-    set coin(coin){
-        this.#model.board(coin)
+        console.log("play event")
+        
+        this.view.playEvent.addListener(move => { this.model.play(move); });
+
+        this.model.updateCellEvent.addListener(data => { this.view.updateCell(data); });
+        this.model.victoryEvent.addListener(winner => { this.view.victory(winner); });
+        this.model.drawEvent.addListener(() => { this.view.draw(); });
     }
 }
 
-const app = new Controller(new Model() , new View());
+const app = new Controller();
