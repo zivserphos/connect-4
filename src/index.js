@@ -24,12 +24,25 @@ class Model {
         this.drawEvent = new Event();
     }
 
+    findPoistion(move) {
+        const column = move%7;
+        let row = 0;
+        while (row < 7 && this.board[row][column] !== undefined) {
+            console.log("into the while");
+            row += 1;
+        }
+        if (row < 7) {
+            this.board[row][column] = this.currentPlayer
+        }
+    }
+
     play(move) {
         console.log("Model Play function")
         if (this.finished || move < 0 || move > 48 || this.board === "RED" || this.board === "BLUE") {
              return false;
         }
-        this.board[Math.floor(move/7)][move%7] = this.currentPlayer;
+        //this.board[Math.floor(move/7)][move%7] = this.currentPlayer;
+        this.findPoistion(move)
         console.log(this.board)
         this.updateCellEvent.trigger({ move , player: this.currentPlayer });
         this.finished = this.victory() || this.draw();
