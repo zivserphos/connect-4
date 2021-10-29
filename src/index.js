@@ -161,16 +161,18 @@ class View{
     }
 
     updateCell(data) {
-        let index =0;
-        let columnButtom = document.querySelector(`.div${49 - (6 -data.move % 7)}`)
+        let position = 49 - (6 -data.move % 7)
+        let columnButtom = document.querySelector(`.div${position}`)
         while (columnButtom.style.backgroundColor !== "") {
-            index+=7;
-            columnButtom = document.querySelector(`.div${49 - (6 -data.move % 7 + index)}`)
+            position-=7;
+            if (position<1){
+                return;
+            }
+            columnButtom = document.querySelector(`.div${position}`)
         }
-        console.log(6 -data.move % 7+index)
-        if (6 -data.move % 7+index < 50){
+        if (position < 50){
             console.log("update cell in View")
-            document.querySelector(`.div${49 - ((6 -data.move % 7)+index)}`).style.backgroundColor = data.player;
+            document.querySelector(`.div${position}`).style.backgroundColor = data.player;
         }
         // console.log("update cell in View")
         // document.querySelector(`.div${data.move +1}`).style.backgroundColor = data.player;
