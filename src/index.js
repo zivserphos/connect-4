@@ -15,7 +15,6 @@ class Event {
 class Model {
     constructor() {
         this.board = this.generateBoard()
-        console.log(this.board)
         this.currentPlayer = "RED";
         this.finished = false;
 
@@ -28,32 +27,29 @@ class Model {
         const column = move%7;
         let row = 0;
         while (row < 7 && this.board[row][column] !== undefined) {
-            console.log("into the while");
             row += 1;
         }
         if (row < 7) {
             this.board[row][column] = this.currentPlayer
+            return 49 - (row*7 + 7 - column);
         }
+        
     }
 
     play(move) {
-        console.log("Model Play function")
         if (this.finished || move < 0 || move > 48 || this.board === "RED" || this.board === "BLUE") {
              return false;
         }
-        //this.board[Math.floor(move/7)][move%7] = this.currentPlayer;
-        this.findPoistion(move)
-        console.log(this.board)
+        move = (this.findPoistion(move))
         this.updateCellEvent.trigger({ move , player: this.currentPlayer });
-        this.finished = this.victory() || this.draw();
-        if (!this.finished) {
+        if (!this.finished && move >= 0) {
             this.switchPlayer()
+            this.finished = this.victory(move) || this.draw();
         }
         return true;
     }
 
     draw() {
-        console.log("check draw in model")
         let draw = true;
         for (let i=0; i<7; i++) {
             for (let k=0; k<7; k++) {
@@ -71,68 +67,33 @@ class Model {
     generateBoard() {
         const arrR = [[] , [] , []  , [] , [] , [] , []]
         for (let i =0; i<7; i++){
-            // for (let k=1; k<8; k++) {
-            //     arrR[i-1].push([i , k])
-            // }
             arrR[i] = [,,,,,,,]
         }
         return arrR;
     }
 
 
-    victory() {
-        console.log("check victory in model")
-        console.log(this.currentPlayer)
+    victory(move) {
+        console.log(move)
         let sequence = 0;
         let victory=false
-        // for (let i =0; i<7; i++) { // win by 4 in a row
-        //     for (let k=0; k<7; k++) {
-        //         console.log(this.board[i][k] !== undefined)
-        //         if (this.board[i][k] === this.board[i][k+1] && this.board[i][k] !== undefined) {
-        //             sequence+=1;
-        //         }
-        //         else {
-        //             sequence =0;
-        //         }
-        //         if (sequence === 3) {
-        //             victory = true;
-        //         }
-        //     }
-        // }
-        // for (let i =0; i<7; i++) { // win by 4 in a column
-        //     for (let k=0; k<6; k++) {
-        //         if (this.board[k][i] === this.board[k+1][i]) {
-        //             sequence+=1;
-        //         }
-        //         else {
-        //             sequence =0;
-        //         }
-        //         if (sequence === 3) {
-        //             victory = true;
-        //         }
-        //     }
-        // }
-        // for (let i =0; i<7; i++) { // win by 4 in a
-        //     for (let k=0; k<7; k++) {
-        //         while (this.board[i][k] === this.board[i+1][k+1])  {
-        //             sequence+=1;
-        //             i+=1;
-        //             k+=1;
-        //         }
-        //         if (sequence === 3) {
-        //             victory = true;
-        //         }
-        //         else { 
-        //             i-=sequence;
-        //             k-= sequence;
-        //         }
-        //     }
-        // }
+        
         if (victory) {
             this.victoryEvent.trigger(this.currentPlayer)
         }
         return victory;
 
+    }
+
+    rowChecks(move) {
+        const exactRow = Math.floor(move/7)
+        let sequence = 1;
+        if (6-exactRow === 0 || 6-exactRow === 6) {
+                const operation = exactRow > 4 ? "+" : "-"
+                
+            }
+        }
+        //this.r
     }
 
     switchPlayer() {
@@ -143,7 +104,6 @@ class Model {
 
 class View{
     constructor() {
-        console.log("view created")
         this.playEvent = new Event();
         this.board = this.defaultBoard()
     }
@@ -174,21 +134,9 @@ class View{
     }
 
     updateCell(data) {
-        let position = 49 - (6 -data.move % 7)
-        let columnButtom = document.querySelector(`.div${position}`)
-        while (columnButtom.style.backgroundColor !== "") {
-            position-=7;
-            if (position<1){
-                return;
-            }
-            columnButtom = document.querySelector(`.div${position}`)
+        if (data.move || data.move===0) {
+            document.querySelector(`.div${data.move +1}`).style.backgroundColor = data.player;
         }
-        if (position < 50){
-            console.log("update cell in View")
-            document.querySelector(`.div${position}`).style.backgroundColor = data.player;
-        }
-        // console.log("update cell in View")
-        // document.querySelector(`.div${data.move +1}`).style.backgroundColor = data.player;
       }
     
       victory(winner) {
@@ -202,11 +150,8 @@ class View{
 
 class Controller{
     constructor(model , view) {
-        console.log("controller constructor")
         this.model = new Model;
         this.view = new View;
-
-        console.log("play event")
         
         this.view.playEvent.addListener(move => { this.model.play(move); });
 
