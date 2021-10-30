@@ -1,5 +1,3 @@
-let x = 0
-
 class Event {
     constructor() {
       this.listeners = [];
@@ -207,7 +205,7 @@ class View{
       }
     
       draw() {
-        this.message.innerHTML = "It's a draw!";
+        alert("It's a draw!")
     }   
 }
 
