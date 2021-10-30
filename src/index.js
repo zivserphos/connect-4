@@ -76,15 +76,59 @@ class Model {
 
 
     victory(move) {
-        let sequence = 0;
-        const victory = this.rowChecks(move) || this.columnChecks
-        
+        const victory = this.rowChecks(move) || this.columnChecks(move) || this.slantChecksForward(move) || this.slantChecksBackward(move)
         if (victory) {
             this.switchPlayer()
             this.victoryEvent.trigger(this.currentPlayer)
         }
         return victory;
 
+    }
+
+    slantChecksBackward(move) {
+        const exactColumn = move%7;
+        const exactRow = 6 - Math.floor(move/7) 
+        let row = exactRow + exactColumn > 6 ? 6 : exactRow + exactColumn
+        let sequence = 1;
+        let column = exactColumn - 6 + exactRow < 0 ? 0 : exactColumn - 6 + exactRow
+        console.log(column)
+        
+        while(this.board[row-1]) {
+            this.board[row][column] === this.board[row-1][column+1] && this.board[row][column] !== undefined 
+            ? sequence+=1
+            : sequence =1;
+            if (sequence === 4){
+                return true;
+            } 
+            row-=1;
+            column+=1;
+        }
+        return false;
+    }
+
+    slantChecksForward(move) {
+        let exactColumn = move%7;
+        let exactRow = 6 - Math.floor(move/7)
+        let sequence =1;
+
+        let slant = exactColumn > exactRow
+        ? exactRow
+        : exactColumn
+        
+        exactColumn -=slant
+        exactRow -= slant
+        while (this.board[exactRow+1]) {
+            this.board[exactRow][exactColumn] === this.board[exactRow+1][exactColumn+1] && this.board[exactRow][exactColumn] !== undefined
+            ? sequence+=1
+            : sequence=1
+            if (sequence === 4){
+                return true;
+            } 
+            exactRow+=1;
+            exactColumn+=1;
+        }
+        return false
+        
     }
 
     columnChecks(move) {
@@ -114,22 +158,6 @@ class Model {
         }
         return false;
     }
-
-    // const exactRow = 6 - Math.floor(move/7)
-    // let sequence =1;
-    // for(let i=0; i<6; i++) {
-    //     if (this.board[exactRow][i] === this.board[exactRow][i+1] && this.board[exactRow][i] !== undefined){
-    //         sequence+=1;
-    //     }
-    //     else {
-    //         sequence =1;
-    //     }
-    //     if (sequence === 4){
-    //         return true;
-    //     }
-        
-    // }
-    // return false;
 
     switchPlayer() {
         this.currentPlayer = this.currentPlayer === "RED" ? "BLUE" : "RED"
