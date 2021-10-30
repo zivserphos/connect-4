@@ -1,3 +1,5 @@
+let x = 0
+
 class Event {
     constructor() {
       this.listeners = [];
@@ -74,33 +76,66 @@ class Model {
 
 
     victory(move) {
-        console.log(move)
         let sequence = 0;
-        let victory=false
+        const victory = this.rowChecks(move) || this.columnChecks
         
         if (victory) {
+            this.switchPlayer()
             this.victoryEvent.trigger(this.currentPlayer)
         }
         return victory;
 
     }
 
-    rowChecks(move) {
-        const exactRow = Math.floor(move/7)
+    columnChecks(move) {
+        const exactColumn = move%7;
         let sequence = 1;
-        if (6-exactRow === 0 || 6-exactRow === 6) {
-                const operation = exactRow > 4 ? "+" : "-"
-                
-            }
+        for (let i=0; i<6; i++) {
+            (this.board[i][exactColumn] === this.board[i+1][exactColumn] && this.board[i][exactColumn] !== undefined)
+            ? sequence+=1
+            : sequence=1;
+            if (sequence === 4){
+                return true;
+            } 
         }
-        //this.r
+        return false
     }
+
+    rowChecks(move) {
+        const exactRow = 6 - Math.floor(move/7)
+        let sequence =1;
+        for(let i=0; i<6; i++) {
+            this.board[exactRow][i] === this.board[exactRow][i+1] && this.board[exactRow][i] !== undefined
+            ? sequence+=1
+            : sequence =1
+            if (sequence === 4){
+                return true;
+            } 
+        }
+        return false;
+    }
+
+    // const exactRow = 6 - Math.floor(move/7)
+    // let sequence =1;
+    // for(let i=0; i<6; i++) {
+    //     if (this.board[exactRow][i] === this.board[exactRow][i+1] && this.board[exactRow][i] !== undefined){
+    //         sequence+=1;
+    //     }
+    //     else {
+    //         sequence =1;
+    //     }
+    //     if (sequence === 4){
+    //         return true;
+    //     }
+        
+    // }
+    // return false;
 
     switchPlayer() {
         this.currentPlayer = this.currentPlayer === "RED" ? "BLUE" : "RED"
     }
-    
 }
+    
 
 class View{
     constructor() {
